@@ -22,6 +22,11 @@ public class TicTacToe {
     private static int lastTurnX;
     private static int lastTurnY;
 
+    private static int lastHumanTurnX;
+    private static int lastHumanTurnY;
+
+    private static int turns;
+
     private static Scanner scanner;
     private static Random random;
 
@@ -31,17 +36,27 @@ public class TicTacToe {
 
         init();
 
+        int maxTurns = xScale * yScale;
+
+        boolean humanWinner = false;
+        boolean aiWinner = false;
+
         do{
             humanTurn();
-            if(checkWin())break;
-            aiTurn();
-            if(checkWin())break;
+            humanWinner = checkWin();
+            if(humanWinner || turns == maxTurns)break;
+
+            aiSmartTurn();
+            aiWinner = checkWin();
+            if(aiWinner || turns == maxTurns)break;
         } while (true);
 
-        if(lastTurnTag == humanTag){
+        if(humanWinner){
             System.out.println("Человек победил!");
-        }else{
-            System.out.println("Bite my shiny metal ass!");
+        } else if (aiWinner){
+            System.out.println("Компьютер победил!");
+        } else {
+            System.out.println("Победила дружба!");
         }
 
         scanner.close();
@@ -57,9 +72,162 @@ public class TicTacToe {
         } while ((x < 1 || x > xScale) && (y < 1 || y > yScale));
 
         turn(humanTag, x - 1, y - 1);
+        lastHumanTurnX = x - 1;
+        lastHumanTurnY = y - 1;
     }
 
-    private static void aiTurn(){
+    private static void aiSmartTurn(){
+        int lineX = 0;
+
+        int xTurn = -1;
+        //check horizontal
+        int x = lastHumanTurnX - 1;
+        while (x >= 0){
+            if(field[x][lastHumanTurnY] == humanTag){
+                lineX++;
+            } else if (field[x][lastHumanTurnY] == EMPTY_TAG){
+                xTurn = x;
+            }
+            x--;
+        }
+        x = lastHumanTurnX + 1;
+        while (x < xScale){
+            if(field[x][lastHumanTurnY] == humanTag){
+                lineX++;
+            } else if (field[x][lastHumanTurnY] == EMPTY_TAG){
+                xTurn = x;
+            }
+            x++;
+        }
+
+        if (xTurn == -1){
+            lineX = 0;
+        }
+
+        //check vertical
+        int y = lastHumanTurnY - 1;
+        int lineY = 0;
+        int yTurn = -1;
+        while (y >= 0){
+            if(field[lastHumanTurnX][y] == humanTag){
+                lineY++;
+            } else if (field[lastHumanTurnX][y] == EMPTY_TAG){
+                yTurn = y;
+            }
+            y--;
+        }
+        y = lastHumanTurnY + 1;
+        while (y < yScale){
+            if(field[lastHumanTurnX][y] == humanTag){
+                lineY++;
+            } else if (field[lastHumanTurnX][y] == EMPTY_TAG){
+                yTurn = y;
+            }
+            y++;
+        }
+
+        if(yTurn == -1){
+            lineY = 0;
+        }
+
+        if(lineY >= lineX){
+            lineX = 0;
+        }
+
+        //check mainD
+        y = lastHumanTurnY - 1;
+        x = lastHumanTurnX - 1;
+        int lineD1 = 0;
+        int yD1Turn = -1;
+        int xD1Turn = -1;
+        while (y >= 0 && x >= 0){
+            if(field[x][y] == humanTag){
+                lineD1++;
+            } else if (field[x][y] == EMPTY_TAG){
+                yD1Turn = y;
+                xD1Turn = x;
+            }
+            y--;x--;
+        }
+        y = lastHumanTurnY + 1;
+        x = lastHumanTurnX + 1;
+        while (y < yScale && x < xScale){
+            if(field[x][y] == humanTag){
+                lineD1++;
+            } else if (field[x][y] == EMPTY_TAG){
+                yD1Turn = y;
+                xD1Turn = x;
+            }
+            y++;x++;
+        }
+
+        if(yD1Turn == -1 || xD1Turn == -1){
+            lineD1 = 0;
+        }
+        if(lineD1 >= lineX){
+            lineX = 0;
+        }
+        if(lineD1 >= lineY){
+            lineY = 0;
+        }
+
+        //check subD
+        y = lastHumanTurnY - 1;
+        x = lastHumanTurnX + 1;
+        int lineD2 = 0;
+        int yD2Turn = -1;
+        int xD2Turn = -1;
+        while (y >= 0 && x < xScale){
+            if(field[x][y] == humanTag){
+                lineD2++;
+            } else if (field[x][y] == EMPTY_TAG){
+                yD2Turn = y;
+                xD2Turn = x;
+            }
+            y--;x++;
+        }
+        y = lastHumanTurnY + 1;
+        x = lastHumanTurnX - 1;
+        while (y < yScale && x >= 0){
+            if(field[x][y] == humanTag){
+                lineD2++;
+            } else if (field[x][y] == EMPTY_TAG){
+                yD2Turn = y;
+                xD2Turn = x;
+            }
+            y++;x--;
+        }
+
+        if(yD2Turn == -1 || xD2Turn == -1){
+            lineD2 = 0;
+        }
+        if(lineD2 >= lineX){
+            lineX = 0;
+        }
+        if(lineD2 >= lineY){
+            lineY = 0;
+        }
+        if(lineD2 >= lineX){
+            lineX = 0;
+        }
+        if(lineD2 >= lineD1){
+            lineD1 = 0;
+        }
+
+        if(lineX > 0){
+            turn(aiTag, xTurn, lastHumanTurnY);
+        } else if (lineY > 0){
+            turn(aiTag, lastHumanTurnX, yTurn);
+        } else if (lineD1 > 0) {
+            turn(aiTag, xD1Turn, yD1Turn);
+        } else if (lineD2 > 0) {
+            turn(aiTag, xD2Turn, yD2Turn);
+        } else{
+            aiStupidTurn();
+        }
+    }
+
+    private static void aiStupidTurn(){
         int x;
         int y;
         do{
@@ -100,9 +268,10 @@ public class TicTacToe {
             x = lastTurnX + 1;
             y = lastTurnY - 1;
         }else{
-            x = lastTurnX + (dX ? 1 : -1);
-            y = lastTurnY + (dY ? 1 : -1);
+            x = lastTurnX + (dX ? -1 : 0);
+            y = lastTurnY + (dY ? -1 : 0);
         }
+
         while (x >= 0 && x < xScale && y >= 0 && y < yScale){
             if (field[x][y] == lastTurnTag){
                 if(++line == winLength){
@@ -111,8 +280,8 @@ public class TicTacToe {
                 if(!dX && !dY){
                     x++;y--;
                 }else{
-                    x += dX ? 0 : 1;
-                    y += dY ? 0 : 1;
+                    x -= dX ? 1 : 0;
+                    y -= dY ? 1 : 0;
                 }
             } else {
                 break;
@@ -140,6 +309,7 @@ public class TicTacToe {
         lastTurnX = x;
         lastTurnY = y;
         printField();
+        turns++;
     }
 
     private static void printField(){
