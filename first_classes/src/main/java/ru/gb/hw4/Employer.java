@@ -36,8 +36,45 @@ public class Employer {
         return CURRENT_YEAR - birthYear;
     }
 
+    private String ageString(){
+        int age = CURRENT_YEAR - birthYear;
+        if(age > 4 && age < 20){
+            return age + " лет";
+        }else{
+            switch (age%10) {
+                case 1: return age + " год";
+                case 2:
+                case 3:
+                case 4: return age + " года";
+                default: return age + " лет";
+            }
+        }
+    }
+
+    private String checkNull(String str, String conMessage, String nullMessage){
+        if (str == null){
+            return nullMessage;
+        }else{
+            return conMessage + " " + str;
+        }
+    }
+
+    private String emailString(){
+        return checkNull(email, "почта", "нет почты");
+    }
+
+    private String phoneString(){
+        return checkNull(phone, "телефон", "нет телефона");
+    }
+
     public void sayMyName(){
-        System.out.println("Я, " + fio + ", " + birthYear + " года рождения, имею телефон " + phone + " и почту " + email + ", и зарабатываю " + salary + " в год");
+        System.out.println("Я " + fio + ", мне " + ageString() + ", " + phoneString() + ", " + emailString() + ", и зарабатываю " + salary + " в год");
+    }
+
+    public void elderVoice(int borderAge){
+        if (borderAge <= CURRENT_YEAR - birthYear){
+            sayMyName();
+        }
     }
 
 }
