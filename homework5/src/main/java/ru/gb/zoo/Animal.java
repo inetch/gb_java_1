@@ -40,6 +40,52 @@ public abstract class Animal {
 
     @Override
     public String toString() {
-        return "I am a " + spec + "! I can run " + maxRunLength + " meters, swim " + maxSwimLength + " meters and jump on " + maxJumpHeight + "meters!";
+        return String.format("I am a %s! I can run %d meters, swim %d meters and jump on %.1f meters!", spec, maxRunLength, maxSwimLength, maxJumpHeight);
+    }
+
+    public String getSpec(){
+        return spec;
+    }
+
+    public static void chaseRun(int[] distances, Animal[] zoo){
+        System.out.println();
+        for(int d : distances) {
+            System.out.println(String.format("Run %d meters!", d));
+            for (Animal a : zoo) {
+                if (a.run(d)){
+                    System.out.println(a.getSpec() + " runs!");
+                } else {
+                    System.out.println(a.getSpec() + " fails...");
+                }
+            }
+        }
+    }
+
+    public static void chaseSwim(int[] distances, Animal[] zoo){
+        System.out.println();
+        for(int d : distances) {
+            System.out.println(String.format("Swim %d meters!", d));
+            for (Animal a : zoo) {
+                if (a.swim(d)){
+                    System.out.println(a.getSpec() + " swims!");
+                } else {
+                    System.out.println(a.getSpec() + " fails...");
+                }
+            }
+        }
+    }
+
+    public static void chaseJump(double[] distances, Animal[] zoo){
+        System.out.println();
+        for(double d : distances) {
+            System.out.println(String.format("Jump %.1f meters!", d));
+            for (Animal a : zoo) {
+                if (a.jump(d)){
+                    System.out.println(a.getSpec() + " jumps!");
+                } else {
+                    System.out.println(a.getSpec() + " fails...");
+                }
+            }
+        }
     }
 }
